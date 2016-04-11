@@ -147,12 +147,12 @@ memset(yes,0,(*net).NeuNum*sizeof(int));
 printf("%d \n",i);
 for(int j=0;j<(*net).NeuNum;j++){
 
-dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));//TODO: Here needs change to KD-TREE
+dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));//TODO: Here needs change to KD-TREE to find the nearest neuron. The speed now is TOO SLOW to do everything.
 }
 for(int j=0;j<((*((*net).Neus[i])).InNum);j++){
 float l=1000;
 int m=0;
-for(int k=0;k<(*net).NeuNum;k++){//TODO : Here needs change to FAST SORT
+for(int k=0;k<(*net).NeuNum;k++){//
 if(l>dis[k]&&yes[k]!=1){
 l=dis[k];
 m=k;
@@ -163,6 +163,8 @@ yes[m]=1;
 }
 
 }
+free(dis);
+free(yes);
 }
 void StepI(struct IzhNeu* Neu){
 (*Neu).I=0;
