@@ -135,6 +135,7 @@ int* yes;
 dis=malloc(((*net).NeuNum)*sizeof(float));
 yes=malloc(((*net).NeuNum)*sizeof(int));
 for(int i=0;i<(*net).NeuNum;i++){
+
 (*((*net).Neus[i])).x=FloatRandNum();
 (*((*net).Neus[i])).y=FloatRandNum();
 (*((*net).Neus[i])).z=FloatRandNum();
@@ -143,8 +144,10 @@ for(int i=0;i<(*net).NeuNum;i++){
 for(int i=0;i<((*net).NeuNum);i++){
 memset(dis,0,(*net).NeuNum*sizeof(float));
 memset(yes,0,(*net).NeuNum*sizeof(int));
+printf("%d \n",i);
 for(int j=0;j<(*net).NeuNum;j++){
-dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));
+
+dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));//TODO: Here needs change to KD-TREE
 }
 for(int j=0;j<((*((*net).Neus[i])).InNum);j++){
 float l=1000;
@@ -160,6 +163,8 @@ yes[m]=1;
 }
 
 }
+free(dis);
+free(yes);
 }
 void StepI(struct IzhNeu* Neu){
 (*Neu).I=0;

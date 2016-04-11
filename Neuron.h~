@@ -135,6 +135,7 @@ int* yes;
 dis=malloc(((*net).NeuNum)*sizeof(float));
 yes=malloc(((*net).NeuNum)*sizeof(int));
 for(int i=0;i<(*net).NeuNum;i++){
+
 (*((*net).Neus[i])).x=FloatRandNum();
 (*((*net).Neus[i])).y=FloatRandNum();
 (*((*net).Neus[i])).z=FloatRandNum();
@@ -143,13 +144,15 @@ for(int i=0;i<(*net).NeuNum;i++){
 for(int i=0;i<((*net).NeuNum);i++){
 memset(dis,0,(*net).NeuNum*sizeof(float));
 memset(yes,0,(*net).NeuNum*sizeof(int));
+printf("%d \n",i);
 for(int j=0;j<(*net).NeuNum;j++){
-dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));
+
+dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));//TODO: Here needs change to KD-TREE
 }
 for(int j=0;j<((*((*net).Neus[i])).InNum);j++){
 float l=1000;
 int m=0;
-for(int k=0;k<(*net).NeuNum;k++){
+for(int k=0;k<(*net).NeuNum;k++){//TODO : Here needs change to FAST SORT
 if(l>dis[k]&&yes[k]!=1){
 l=dis[k];
 m=k;
