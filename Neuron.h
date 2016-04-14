@@ -5,7 +5,7 @@
 struct IzhNeu{
 float a,b,c,d,u,v,I;		//Basic arguments of Izhikevich Neuron
 float x,y,z;
-unsigned int InNum;
+unsigned int InNum,Nnum;
 char fired;
 struct IzhNeu** InNeus;
 float* S;
@@ -69,26 +69,27 @@ for(unsigned int i=0;i<(*Neu).InNum;i++){
 }
 }
 }
-struct IzhNeu* ExNeuGen(unsigned int num){
+struct IzhNeu* ExNeuGen(unsigned int num,unsigned int nnum){
 struct IzhNeu* Neu=malloc(sizeof(struct IzhNeu));
 if(Neu!=NULL){
 (*Neu).InNum=num;
 ExNeuInit(Neu);
 (*Neu).S=malloc(num*sizeof(float));
 (*Neu).InNeus=malloc(num*sizeof(struct IzhNeu*));
+(*Neu).Nnum=nnum;
 }
 ExWeightsInit(Neu);
 return Neu;
 }
 //
-struct IzhNeu* InNeuGen(unsigned int num){
+struct IzhNeu* InNeuGen(unsigned int num,unsigned int nnum){
 struct IzhNeu* Neu=malloc(sizeof(struct IzhNeu));
 if(Neu!=NULL){
 (*Neu).InNum=num;
 InNeuInit(Neu);
 (*Neu).S=malloc(num*sizeof(float));
 (*Neu).InNeus=malloc(num*sizeof(struct IzhNeu*));
-
+(*Neu).Nnum=nnum;
 }
 InWeightsInit(Neu);
 return Neu;
@@ -97,10 +98,10 @@ void NetInit(struct Network* in){//
 if(in!=NULL){
 for(unsigned int i=0;i<(*in).NeuNum;i++){
 if(FloatRandNum()>0.8){
-(*in).Neus[i]=InNeuGen(1000);
+(*in).Neus[i]=InNeuGen(1000,i);
 //puts("e");
 }else{
-(*in).Neus[i]=ExNeuGen(1000);
+(*in).Neus[i]=ExNeuGen(1000,i);
 //puts("i");
 }
 }
