@@ -156,7 +156,7 @@ for(int j=0;j<g;j++){
 
 dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));//TODO: Here needs change to KD-TREE to find the nearest neuron. The speed now is TOO SLOW to do anything.
 }
-for(int j=0;j<((*((*net).Neus[i])).InNum);j++){
+for(int j=0;j<g;j++){
 float l=1000;
 int m=0;
 for(int k=0;k<g;k++){//

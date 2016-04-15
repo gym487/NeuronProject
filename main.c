@@ -6,7 +6,7 @@
 int main(){
 //print_time();
 struct Network* Net1;
-Net1=NetGen(1000);
+Net1=NetGen(10000);
 NetInit(Net1);
 ConInit(Net1);
 for(int j=0;j<=100000;j++){
