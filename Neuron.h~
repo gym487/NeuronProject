@@ -151,7 +151,7 @@ for(int i=0;i<((*net).NeuNum);i++){
 int g=(*net).NeuNum*0.8;
 memset(dis,0,(*net).NeuNum*sizeof(float));
 memset(yes,0,(*net).NeuNum*sizeof(int));
-printf("%d a\n",i);
+printf("%d \n",i);
 for(int j=0;j<g;j++){
 
 dis[j]=sqrt(FSqur((*((*net).Neus[i])).x-(*((*net).Neus[j])).x)+FSqur((*((*net).Neus[i])).y-(*((*net).Neus[j])).y)+FSqur((*((*net).Neus[i])).z+(*((*net).Neus[j])).z));//TODO: Here needs change to KD-TREE to find the nearest neuron. The speed now is TOO SLOW to do anything.
