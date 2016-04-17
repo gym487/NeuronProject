@@ -2,6 +2,8 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
+#include"kdtree.c"
+int p;
 struct IzhNeu{
 float a,b,c,d,u,v,I;		//Basic arguments of Izhikevich Neuron
 float x,y,z;
@@ -31,6 +33,129 @@ return a;
 float FSqur(float a){
 return a*a;
 }
+#if 0
+struct kdtree{
+float x,y,z;//location
+struct kdtree *l,*r,*p;//left child, right chaild, parent
+void* po;//poniter
+int deepth;
+};
+
+int jy(float a){
+if(a>0)
+return 1;
+if(a<0)
+return -1;
+if(a==0)
+return 0;
+}
+struct NeuList{
+struct IzhNeu** nps;//Neuron PointerS
+int num;
+};
+int compx(const void* a,const void* b){
+if(a!=NULL&&b!=NULL)
+return jy((((struct IzhNeu*)a)->x)-(((struct IzhNeu*)b)->x));
+}
+int compz(const void* a,const void* b){
+if(a!=NULL&&b!=NULL)
+return jy((((struct IzhNeu*)a)->z)-(((struct IzhNeu*)b)->z));
+}
+int compy(const void* a,const void* b){
+if(a!=NULL&&b!=NULL)
+return jy((((struct IzhNeu*)a)->y)-(((struct IzhNeu*)b)->y));
+}
+
+void NeuSortX(struct NeuList* in){
+qsort((*(in->nps)),(in->num),sizeof(struct IzhNeu),compx);
+}
+void NeuSortY(struct NeuList* in){
+qsort((*(in->nps)),(in->num),sizeof(struct IzhNeu),compy);
+}
+void NeuSortZ(struct NeuList* in){
+qsort((*(in->nps)),(in->num),sizeof(struct IzhNeu),compz);
+}
+struct NeuList* NeuListGen(struct Network* in){
+struct NeuList* nl=malloc(sizeof(struct NeuList*));
+nl->num=in->NeuNum;
+nl->nps=malloc((in->NeuNum)*sizeof(struct IzhNeu*));
+for(int i=0;i<(in->NeuNum);i++){
+nl->nps[i]=in->Neus[i];
+}
+return nl;
+}
+struct kdtree* kdNodeGen(struct NeuList* xnl,int xbegin,int xend,
+		struct NeuList* ynl,int ybegin,int yend,
+		struct NeuList* znl,int zbegin,int zend,
+				struct kdtree* pa,int dep){
+int mid=0;
+
+//printf("%d %d %d\n",dep,xbegin,xend);
+struct kdtree* node=NULL;
+
+if(dep%3==0){
+mid=(xbegin+xend)/2;
+if(mid!=xbegin&&mid!=xend){
+node=malloc(sizeof(struct kdtree));
+p++;
+node->deepth=dep;
+//printf("%d %d %d %d\n",dep,xbegin,mid,xend);
+node->x=xnl->nps[mid]->x;
+node->y=xnl->nps[mid]->y;
+node->z=xnl->nps[mid]->z;
+node->po=xnl->nps[mid];
+
+node->p=pa;
+
+node->l=kdNodeGen(xnl,xbegin,mid,ynl,ybegin,yend,znl,zbegin,zend,node,dep+1);
+node->r=kdNodeGen(xnl,mid,xend,ynl,ybegin,yend,znl,zbegin,zend,node,dep+1);
+}
+}
+if(dep%3==1){
+mid=(ybegin+yend)/2;
+if(mid!=ybegin&&mid!=yend){
+node=malloc(sizeof(struct kdtree));
+p++;
+node->deepth=dep;
+node->x=ynl->nps[mid]->x;
+node->y=ynl->nps[mid]->y;
+node->z=ynl->nps[mid]->z;
+node->po=ynl->nps[mid];
+node->p=pa;
+node->l=kdNodeGen(xnl,xbegin,xend,ynl,ybegin,mid,znl,zbegin,zend,node,dep+1);
+node->r=kdNodeGen(xnl,xbegin,xend,ynl,mid,yend,znl,zbegin,zend,node,dep+1);
+}
+}
+if(dep%3==2){
+mid=(ybegin+yend)/2;
+if(mid!=ybegin&&mid!=yend){
+node=malloc(sizeof(struct kdtree));
+p++;
+node->deepth=dep;
+node->x=znl->nps[mid]->x;
+node->y=znl->nps[mid]->y;
+node->z=znl->nps[mid]->z;
+node->po=znl->nps[mid];
+node->p=pa;
+node->l=kdNodeGen(xnl,xbegin,xend,ynl,ybegin,yend,znl,zbegin,mid,node,dep+1);
+node->r=kdNodeGen(xnl,xbegin,xend,ynl,ybegin,yend,znl,mid,zend,node,dep+1);
+}
+}
+return node;
+}
+struct kdtree* kdGen(struct Network* in){
+struct NeuList* nlx=NeuListGen(in);
+struct NeuList* nly=NeuListGen(in);
+struct NeuList* nlz=NeuListGen(in);
+
+NeuSortX(nlx);
+NeuSortY(nlx);//
+NeuSortZ(nlx);
+
+return kdNodeGen(nlx,-1,in->NeuNum,nly,-1,in->NeuNum,nlz,-1,in->NeuNum,NULL,0);
+}
+#endif
+
 void ExNeuInit(struct IzhNeu* Neu){
 if(Neu!=NULL){
 float re=FloatRandNum();
@@ -136,7 +261,7 @@ if((*Neu).v>=30){
 (*Neu).I=0;
 }
 void ConInit(struct Network* net){
-float* dis;
+/*float* dis;
 int* yes;
 dis=malloc(((*net).NeuNum)*sizeof(float));
 yes=malloc(((*net).NeuNum)*sizeof(int));
@@ -173,8 +298,13 @@ for(int j=g;j<(*net).NeuNum;j++){
 }
 }
 
-free(dis);
+//free(dis);
+dis=NULL;
+
 free(yes);
+yes=NULL;
+*/
+
 }
 
 void StepI(struct IzhNeu* Neu){
