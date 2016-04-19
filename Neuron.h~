@@ -261,7 +261,7 @@ if((*Neu).v>=30){
 (*Neu).I=0;
 }
 void ConInit(struct Network* net){
-float* dis;
+/*float* dis;
 int* yes;
 dis=malloc(((*net).NeuNum)*sizeof(float));
 yes=malloc(((*net).NeuNum)*sizeof(int));
@@ -303,8 +303,7 @@ dis=NULL;
 
 free(yes);
 yes=NULL;
-
-/*
+*/
 struct kdtree* ptree;
 ptree=kd_create(3);
 for(int i=0;i<in->NeuNum;i++){
@@ -313,7 +312,7 @@ kd_insert3(ptree,in->Neus[i]->x,in->Neus[i]->y,in->Neus[i]->z,in->Neus[i]);
 for(int i=0;i<in->NeuNum;i++){
 }
 }
-*/
+
 void StepI(struct IzhNeu* Neu){
 
 struct IzhNeu* in;
