@@ -433,9 +433,21 @@ static int find_nearest(struct kdnode *node, const double *pos, double range, st
 
 	return added_res;
 }
-
-
-static int find_nearest_n(struct kdnode *node, const double *pos, double range, int num, struct rheap *heap, int dim)
+int res_size(struct res_node* list){
+for(int i=0;list!=NULL;i++)
+list=list->next;
+}
+struct res_node* get_max_res(struct res_node* list){
+while(list->next!=NULL)
+list=list->next;
+}
+struct res_node* remove_max_res(struct res_node* list){
+while(list->next->next!=NULL)
+list=list->next;
+free_resnode(list->next);
+list->next=NULL;
+}
+static int find_nearest_n(struct kdnode *node, const double *pos, double range, int num, struct res_node *heap, int dim)
 {
 	double dist_sq, dx,range_sq;
 	int i, ret, added_res = 0;
@@ -447,18 +459,19 @@ static int find_nearest_n(struct kdnode *node, const double *pos, double range, 
 	for(i=0; i<dim; i++) {
 		dist_sq += SQ(node->pos[i] - pos[i]);
 	}
-printf("size:%d\n",heap->size);
+printf("size:%d\n",res_size(heap));
+
 	if(dist_sq <= range_sq) {
 	//rheap_insertn(heap, node, dist_sq);
-		if(heap->size >= num) {
+		if(res_size(heap) >= num) {
 			/* get furthest element */
-			struct res_node *maxelem = rheap_get_max(heap);
+			struct res_node *maxelem = get_max_res(heap);
 
 			/* and check if the new one is closer than that */
 			if(maxelem->dist_sq > dist_sq) {
-				rheap_remove_max(heap);
+				remove_max_res(heap);
 
-				if(rheap_insert(heap, node, dist_sq) == -1) {
+				if(rlist_insert(heap, node, dist_sq) == -1) {
 					return -1;
 				}
 				//added_lists = 1;
@@ -466,7 +479,7 @@ printf("size:%d\n",heap->size);
 				range_sq = dist_sq;
 			}
 		} else {
-			if(rheap_insert(heap, node, dist_sq) == -1) {
+			if(rlist_insert(heap, node, dist_sq) == -1) {
 				return -1;
 			}
 			added_res = 1;
@@ -588,8 +601,8 @@ struct kdres *kd_nearest(struct kdtree *kd, const double *pos)
 
 	/* Store the result */
 	if (result) {
-		if (rlist_insert(rset->rlist, result, -1.0) == -1) {
-			kd_res_free(rset);
+		if (rlist_insert(rset->rlist, result, dist_sq) == -1) {
+			free(rset);
 			return 0;
 		}
 		rset->size = 1;
@@ -670,7 +683,7 @@ struct kdres *kd_nearest_n(struct kdtree *kd, const double *pos, int num,double 
 	rset->rlist->next = 0;
 	rset->tree = kd;
 printf("kdsize:%d\n",rset->size);
-	if((ret = find_nearest_n(kd->root, pos, range, num, rheap_create(rset->rlist), kd->dim)) == -1) {
+	if((ret = find_nearest_n(kd->root, pos, range, num,rset->rlist, kd->dim)) == -1) {
 		kd_res_free(rset);
 		return 0;
 	}
@@ -763,10 +776,10 @@ void kd_res_free(struct kdres *rset)
 	free(rset);
 }
 
-//int kd_res_size(struct kdres *set)
-//{
-//	return (set->size);
-//}
+int kd_res_size(struct kdres *set)
+{
+	return (set->size);
+}
 
 void kd_res_rewind(struct kdres *rset)
 {
@@ -964,11 +977,11 @@ static int rlist_insert(struct res_node *list, struct kdnode *item, double dist_
 	rnode->dist_sq = dist_sq;
 
 	if(dist_sq >= 0.0) {
-		while(list->next && list->next->dist_sq < dist_sq) {
+		while(list->next && list->next->dist_sq < dist_sq) {//bigger at after.
 			list = list->next;
 		}
 	}
-	rnode->next = list->next;
+	rnode->next = list->next;//
 	list->next = rnode;
 	return 0;
 }
