@@ -459,7 +459,7 @@ static int find_nearest_n(struct kdnode *node, const double *pos, double range, 
 	for(i=0; i<dim; i++) {
 		dist_sq += SQ(node->pos[i] - pos[i]);
 	}
-printf("size:%d\n",res_size(heap));
+//printf("size:%d\n",res_size(heap));
 
 	if(dist_sq <= range_sq) {
 	//rheap_insertn(heap, node, dist_sq);
@@ -682,14 +682,14 @@ struct kdres *kd_nearest_n(struct kdtree *kd, const double *pos, int num,double 
 	}
 	rset->rlist->next = 0;
 	rset->tree = kd;
-printf("kdsize:%d\n",rset->size);
+//printf("kdsize:%d\n",rset->size);
 	if((ret = find_nearest_n(kd->root, pos, range, num,rset->rlist, kd->dim)) == -1) {
 		kd_res_free(rset);
 		return 0;
 	}
 	rset->size = ret;
 	kd_res_rewind(rset);
-printf("kdsize:%d\n",rset->size);
+//printf("kdsize:%d\n",rset->size);
 	return rset;
 }
 
