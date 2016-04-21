@@ -386,7 +386,7 @@ list->next=NULL;
 return list;
 }
 static int find_nearest_n(struct kdnode *node, const double *pos, double range, int num, struct res_node *heap, int dim)
-{	
+{	//TODO: Make a real heap here.List is TOO slow.
       //  if(res_size(heap)<num){
 //printf("size %d",res_size(heap));
 	double dist_sq, dx,range_sq;

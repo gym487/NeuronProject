@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
+#include <ctype.h>
 #include"kdtree.c"
 int p;
 struct IzhNeu{
@@ -144,27 +145,37 @@ struct kdres* pre;
 struct kdtree* ptree;
 double pos[3],pt[3];
 ptree=kd_create(3);
-for(int i=0;i<net->NeuNum;i++){
-kd_insert3(ptree,net->Neus[i]->x,net->Neus[i]->y,net->Neus[i]->z,(net->Neus)[i]);
+int j=0;
+for(int i=0;i<(*net).NeuNum;i++){
+
+(*((*net).Neus[i])).x=FloatRandNum();
+(*((*net).Neus[i])).y=FloatRandNum();
+(*((*net).Neus[i])).z=FloatRandNum();
 }
-//puts("ok");
+for(int i=0;i<net->NeuNum;i++){
+kd_insert3(ptree,(double)net->Neus[i]->x,(double)net->Neus[i]->y,(double)net->Neus[i]->z,(net->Neus)[i]);
+printf("inserting tree...%d x y z %f %f %f\n",i,net->Neus[i]->x,net->Neus[i]->y,net->Neus[i]->z);
+}
+puts("ok2");
 for(int i=0;i<net->NeuNum;i++){
 printf("Init...%d of %d Neurons...\n",i,net->NeuNum);
 pt[0]=net->Neus[i]->x;
 pt[1]=net->Neus[i]->y;
 pt[2]=net->Neus[i]->z;
 pre=kd_nearest_n( ptree, pt, 800,1 );
-for(int j=1;j<(*net).NeuNum*0.8&&(!kd_res_end(pre));j++){
+for(j=0;j<(*net).NeuNum*0.8&&(!kd_res_end(pre));j++){
 net->Neus[i]->InNeus[j]=(struct IzhNeu*)kd_res_item(pre,pos);
 kd_res_next(pre);
 }
+printf("%d\n ",j);
 //puts("ok");
 for(int j=(*net).NeuNum*0.8;j<(*net).NeuNum;j++){
 (*((*net).Neus[i])).InNeus[j]=(*net).Neus[rand()%(*net).NeuNum];
 }
+  kd_res_free(pre);
+
 }
-  kd_res_free( pre );
-  kd_free( ptree );
+ // kd_free(ptree);
 //puts("ok");
 }
 void StepI(struct IzhNeu* Neu){
