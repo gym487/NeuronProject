@@ -169,70 +169,11 @@ static void free_resnode(struct res_node*);
 #define alloc_resnode()		malloc(sizeof(struct res_node))
 #define free_resnode(n)		free(n)
 #endif
-int nodeins(struct res_node* no,double sq,struct kdnode* node){
-if(no->next==NULL){
-no->next=alloc_resnode();
-no->next->next=NULL;
-no->next->dist_sq=sq;
-no->next->item=node;
-}else{
-if(sq>(no->next->dist_sq)){
-struct res_node* a;
-a=no->next;
-no->next=alloc_resnode();
-no->next->next=a;
-no->next->dist_sq=sq;
-no->next->item=node;
-}
-}
-return 0;
-}
-int rheap_insert(struct rheap* heap,struct kdnode *node,double sq){
-//heap->size=heap->size+1;
-if(heap->next==NULL){
-///puts("ok11");
-return 1;
-heap->next->item=node;
-}else{
-if(sq>(heap->next->dist_sq)){
-/*struct res_node* a; 
-a=heap->next;
-heap->next=alloc_resnode();
-heap->next->dist_sq=sq;
-heap->next->next=a;
-heap->next->item=node;*/
-///puts("ok33");
-return -1;
-}else{
-///puts("ok22");
-heap->size=heap->size+1;
-nodeins(heap->next,sq,node);
-}
-}
-return 1;
-}
-int rheap_insertn(struct rheap* heap,struct kdnode *node,double sq){
-heap->size=heap->size+1;
-if(heap->next==NULL){
-heap->next=alloc_resnode();
-heap->next->dist_sq=sq;
-heap->next->next=NULL;
-heap->next->item=node;
-}else{
-if(sq>(heap->next->dist_sq)){
-struct res_node* a; 
-a=heap->next;
-heap->next=alloc_resnode();
-heap->next->dist_sq=sq;
-heap->next->next=a;
-heap->next->item=node;
 
-}else{
-nodeins(heap->next,sq,node);
+int rheap_insert(struct rheap* heap,struct kdnode *node,double sq){
+
 }
-}
-return 0;
-}
+
 int num_rn(struct res_node* in){
 if(in->next==NULL){
 return 0;
@@ -240,16 +181,9 @@ return 0;
 return num_rn(in->next)+1;
 }
 }
-void resnoden(struct res_node* rn,struct rheap* heap){
-if(rn!=NULL){
-rheap_insertn(heap,rn->item,rn->dist_sq);
-resnoden(rn->next,heap);
-}
-}
+
 struct rheap* rheap_create(struct res_node* in){
-struct rheap* a=malloc(sizeof(struct rheap));
-resnoden(in,a);
-return a;
+
 }
 struct kdtree *kd_create(int k)
 {
@@ -434,21 +368,27 @@ static int find_nearest(struct kdnode *node, const double *pos, double range, st
 	return added_res;
 }
 int res_size(struct res_node* list){
-for(int i=0;list!=NULL;i++)
+int i;
+for(i=0;list!=NULL;i++)
 list=list->next;
+return i;
 }
 struct res_node* get_max_res(struct res_node* list){
 while(list->next!=NULL)
 list=list->next;
+return list;
 }
 struct res_node* remove_max_res(struct res_node* list){
 while(list->next->next!=NULL)
 list=list->next;
 free_resnode(list->next);
 list->next=NULL;
+return list;
 }
 static int find_nearest_n(struct kdnode *node, const double *pos, double range, int num, struct res_node *heap, int dim)
-{
+{	
+      //  if(res_size(heap)<num){
+//printf("size %d",res_size(heap));
 	double dist_sq, dx,range_sq;
 	int i, ret, added_res = 0;
 	range_sq=SQ(range);
@@ -495,7 +435,8 @@ static int find_nearest_n(struct kdnode *node, const double *pos, double range, 
 		added_res += ret;
 		ret = find_nearest_n(dx <= 0.0 ? node->right : node->left, pos, range, num, heap, dim);
 
-	}
+//	}
+}
 return 1;
 }
 

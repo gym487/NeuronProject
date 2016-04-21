@@ -8,7 +8,7 @@
 #include <time.h>
 #include "kdtree.c"
 
-#define DEF_NUM_PTS 10
+#define DEF_NUM_PTS 100000
 
 /* returns the distance squared between two dims-dimensional double arrays */
 static double dist_sq( double *a1, double *a2, int dims );
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   }
 
   /* find points closest to the origin and within distance radius */
-  presults = kd_nearest_n( ptree, pt, 10,radius );
+  presults = kd_nearest_n( ptree, pt, 1000,radius );
 
   /* print out all the points found in results */
   printf( "found %d results:\n", kd_res_size(presults) );
