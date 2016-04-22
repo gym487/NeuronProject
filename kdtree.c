@@ -135,20 +135,22 @@ void *kd_res_item_data(struct kdres *set);
 
 #define SQ(x)			((x) * (x))
 
-struct rheap{
-int size;
-struct res_node* next;
-};
-struct res_node* rheap_get_max(struct rheap* in){
-return in->next;
+struct kdtree *kd_create(int k)
+{
+	struct kdtree *tree;
+
+	if(!(tree = malloc(sizeof *tree))) {
+		return 0;
+	}
+
+	tree->dim = k;
+	tree->root = 0;
+	tree->destr = 0;
+	tree->rect = 0;
+
+	return tree;
 }
-int rheap_remove_max(struct rheap* in){
-if(in->next!=NULL){
-in->size=in->size-1;
-in->next=in->next->next;
-}
-return 1;
-}
+
 
 
 static void clear_rec(struct kdnode *node, void (*destr)(void*));
@@ -169,37 +171,63 @@ static void free_resnode(struct res_node*);
 #define alloc_resnode()		malloc(sizeof(struct res_node))
 #define free_resnode(n)		free(n)
 #endif
-
-int rheap_insert(struct rheap* heap,struct kdnode *node,double sq){
-
+#define alloc_heapnode()		malloc(sizeof(struct hn))
+struct hn{//heap node
+double dist;
+struct kdnode* item;
+};
+struct heap{
+struct hn*  hn;
+int rl,size;
+struct kdtree* tree;
+};
+struct heap* heap_alloc(int num){
+struct heap* he=malloc(sizeof(struct heap));
+he->hn=malloc(sizeof(struct hn)*num);
+he->rl=num;
+he->size=0;
+he->hn[0].dist=1000000000;//make this "dist" bigger than any "dist" will put in to the heap;
+return he;
 }
-
-int num_rn(struct res_node* in){
-if(in->next==NULL){
+struct hn* heap_get_max(struct heap* heap){
+if(heap!=NULL&&heap->size>0){
+return &heap->hn[1];
+}
+}
+int heap_insert(struct heap* heap,void* pt,double dist){
+if(heap->size<heap->rl){
+int i=0;
+for(i=++heap->size;heap->hn[i/2].dist<dist;i/=2)
+heap->hn[i]=heap->hn[i/2];
+heap->hn[i].dist=dist;
+heap->hn[i].item=pt;
+}
 return 0;
-}else{
-return num_rn(in->next)+1;
 }
+void heap_free(struct heap* heap){
+free(heap->hn);
+//free(heap);
+}
+int heap_remove_max(struct heap* heap){
+int i,c;
+struct hn max,last;
+if(heap->size>0){
+max=heap->hn[1];
+last=heap->hn[heap->size--];
+for(i=1;i*2<=heap->size;i=c){
+c=i*2;
+if(c!=heap->size&&heap->hn[c+1].dist>heap->hn[c].dist)
+c++;
+if(last.dist<heap->hn[c].dist)
+heap->hn[i]=heap->hn[c];
+else break;
+}
+heap->hn[i]=last;
+}
+return 0;
 }
 
-struct rheap* rheap_create(struct res_node* in){
 
-}
-struct kdtree *kd_create(int k)
-{
-	struct kdtree *tree;
-
-	if(!(tree = malloc(sizeof *tree))) {
-		return 0;
-	}
-
-	tree->dim = k;
-	tree->root = 0;
-	tree->destr = 0;
-	tree->rect = 0;
-
-	return tree;
-}
 
 void kd_free(struct kdtree *tree)
 {
@@ -385,7 +413,7 @@ free_resnode(list->next);
 list->next=NULL;
 return list;
 }
-static int find_nearest_n(struct kdnode *node, const double *pos, double range, int num, struct res_node *heap, int dim)
+static int find_nearest_n(struct kdnode *node, const double *pos, double range, int num, struct heap *heap, int dim)
 {	//TODO: Make a real heap here.List is TOO slow.
       //  if(res_size(heap)<num){
 //printf("size %d",res_size(heap));
@@ -402,16 +430,16 @@ static int find_nearest_n(struct kdnode *node, const double *pos, double range, 
 //printf("size:%d\n",res_size(heap));
 
 	if(dist_sq <= range_sq) {
-	//rheap_insertn(heap, node, dist_sq);
-		if(res_size(heap) >= num) {
+	//heap_insertn(heap, node, dist_sq);
+		if(heap->size >= num) {
 			/* get furthest element */
-			struct res_node *maxelem = get_max_res(heap);
+			struct hn *maxelem = heap_get_max(heap);
 
 			/* and check if the new one is closer than that */
-			if(maxelem->dist_sq > dist_sq) {
-				remove_max_res(heap);
+			if(maxelem->dist > dist_sq) {
+				heap_remove_max(heap);
 
-				if(rlist_insert(heap, node, dist_sq) == -1) {
+				if(heap_insert(heap, (void*)node, dist_sq) == -1) {
 					return -1;
 				}
 				//added_lists = 1;
@@ -419,7 +447,7 @@ static int find_nearest_n(struct kdnode *node, const double *pos, double range, 
 				range_sq = dist_sq;
 			}
 		} else {
-			if(rlist_insert(heap, node, dist_sq) == -1) {
+			if(heap_insert(heap, (void*)node, dist_sq) == -1) {
 				return -1;
 			}
 			added_res = 1;
@@ -609,29 +637,29 @@ struct kdres *kd_nearest3f(struct kdtree *tree, float x, float y, float z)
 
 /* ---- nearest N search ---- */
 
-struct kdres *kd_nearest_n(struct kdtree *kd, const double *pos, int num,double range)
+struct heap *kd_nearest_n(struct kdtree *kd, const double *pos, int num,double range)
 {
 	int ret;
-	struct kdres *rset;
-
-	if(!(rset = malloc(sizeof *rset))) {
-		return 0;
-	}
-	if(!(rset->rlist = alloc_resnode())) {
-		free(rset);
-		return 0;
-	}
-	rset->rlist->next = 0;
-	rset->tree = kd;
+	//struct kdres *rset;
+	struct heap* heap=heap_alloc(10000);
+	//if(!(rset = malloc(sizeof *rset))) {
+	//	return 0;
+	//}
+	//if(!(rset->rlist = alloc_resnode())) {
+	//	free(rset);
+	//	return 0;
+	//}
+	//rset->rlist->next = 0;
+	heap->tree = (void*)kd;
 //printf("kdsize:%d\n",rset->size);
-	if((ret = find_nearest_n(kd->root, pos, range, num,rset->rlist, kd->dim)) == -1) {
-		kd_res_free(rset);
+	if((ret = find_nearest_n(kd->root, pos, range, num,heap, kd->dim)) == -1) {
+		//kd_res_free(rset);
 		return 0;
 	}
-	rset->size = ret;
-	kd_res_rewind(rset);
+	//rset->size = ret;
+	//kd_res_rewind(rset);
 //printf("kdsize:%d\n",rset->size);
-	return rset;
+	return heap;
 }
 
 struct kdres *kd_nearest_range(struct kdtree *kd, const double *pos, double range)

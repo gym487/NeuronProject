@@ -141,7 +141,7 @@ if((*Neu).v>=30){
 }
 void ConInit(struct Network* net){
 puts("ok");
-struct kdres* pre;
+struct heap* pre;
 struct kdtree* ptree;
 double pos[3],pt[3];
 ptree=kd_create(3);
@@ -163,16 +163,16 @@ pt[0]=net->Neus[i]->x;
 pt[1]=net->Neus[i]->y;
 pt[2]=net->Neus[i]->z;
 pre=kd_nearest_n( ptree, pt, 800,1 );
-for(j=0;j<(*net).NeuNum*0.8&&(!kd_res_end(pre));j++){
-net->Neus[i]->InNeus[j]=(struct IzhNeu*)kd_res_item(pre,pos);
-kd_res_next(pre);
+for(j=0;j<(*net).NeuNum*0.8&&(pre->size>0);j++){
+net->Neus[i]->InNeus[j]=(struct IzhNeu*)heap_get_max(pre)->item->data;
+heap_remove_max(pre);
 }
 printf("%d\n ",j);
 //puts("ok");
 for(int j=(*net).NeuNum*0.8;j<(*net).NeuNum;j++){
 (*((*net).Neus[i])).InNeus[j]=(*net).Neus[rand()%(*net).NeuNum];
 }
-  kd_res_free(pre);
+  heap_free(pre);
 
 }
  // kd_free(ptree);

@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   int i, num_pts = DEF_NUM_PTS;
   void *ptree;
   char *data, *pch;
-  struct kdres *presults;
+  struct heap *presults;
   double pos[3], dist;
   double pt[3] = { 0, 0, 1 };
   double radius = 10;
@@ -50,11 +50,12 @@ int main(int argc, char **argv) {
   presults = kd_nearest_n( ptree, pt, 1000,radius );
 
   /* print out all the points found in results */
-  printf( "found %d results:\n", kd_res_size(presults) );
+  printf( "found %d results:\n", presults->size );
 
-  while( !kd_res_end( presults ) ) {
+  while( presults->size>0 ) {
     /* get the data and position of the current result item */
-    pch = (char*)kd_res_item( presults, pos );
+    pch = (char*)(heap_get_max(presults)->item->data);
+	memcpy(pos, heap_get_max( presults )->item->pos, presults->tree->dim * sizeof *pos);
 
     /* compute the distance of the current result from the pt */
     dist = sqrt( dist_sq( pt, pos, 3 ) );
@@ -64,12 +65,12 @@ int main(int argc, char **argv) {
 	    pos[0], pos[1], pos[2], dist, *pch );
 
     /* go to the next entry */
-    kd_res_next( presults );
+    heap_remove_max( presults );
   }
 
   /* free our tree, results set, and other allocated memory */
   free( data );
-  kd_res_free( presults );
+  heap_free( presults );
   kd_free( ptree );
 
   return 0;
