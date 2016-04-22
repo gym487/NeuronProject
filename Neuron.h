@@ -147,13 +147,17 @@ double pos[3],pt[3];
 ptree=kd_create(3);
 int j=0;
 for(int i=0;i<(*net).NeuNum;i++){
-
-(*((*net).Neus[i])).x=FloatRandNum();
-(*((*net).Neus[i])).y=FloatRandNum();
-(*((*net).Neus[i])).z=FloatRandNum();
+while(net->Neus[i]->x==0||net->Neus[i]->y==0||net->Neus[i]->z==0){
+net->Neus[i]->x=FloatRandNum();
+net->Neus[i]->y=FloatRandNum();
+net->Neus[i]->z=FloatRandNum();
+}
 }
 for(int i=0;i<net->NeuNum;i++){
-kd_insert3(ptree,(double)net->Neus[i]->x,(double)net->Neus[i]->y,(double)net->Neus[i]->z,(net->Neus)[i]);
+pt[0]=net->Neus[i]->x;
+pt[1]=net->Neus[i]->y;
+pt[2]=net->Neus[i]->z;
+kd_insert3(ptree,(double)pt[0],(double)pt[1],(double)pt[2],(net->Neus)[i]);
 printf("inserting tree...%d x y z %f %f %f\n",i,net->Neus[i]->x,net->Neus[i]->y,net->Neus[i]->z);
 }
 puts("ok2");
@@ -162,14 +166,21 @@ printf("Init...%d of %d Neurons...\n",i,net->NeuNum);
 pt[0]=net->Neus[i]->x;
 pt[1]=net->Neus[i]->y;
 pt[2]=net->Neus[i]->z;
+//printf("%d x y z %f %f %f\n",i,net->Neus[i]->x,net->Neus[i]->y,net->Neus[i]->z);
 pre=kd_nearest_n( ptree, pt, 800,1 );
-for(j=0;j<(*net).NeuNum*0.8&&(pre->size>0);j++){
+//printf("%d x y z %f %f %f\n",i,net->Neus[i]->x,net->Neus[i]->y,net->Neus[i]->z);
+for(j=0;j<net->Neus[i]->InNum*0.8&&(pre->size>0);j++){
 net->Neus[i]->InNeus[j]=(struct IzhNeu*)heap_get_max(pre)->item->data;
 heap_remove_max(pre);
 }
 printf("%d\n ",j);
+if(j==0){
+printf("%d x y z %f %f %f\n",i,net->Neus[i]->x,net->Neus[i]->y,net->Neus[i]->z);
+gets();
+}
+//gets();
 //puts("ok");
-for(int j=(*net).NeuNum*0.8;j<(*net).NeuNum;j++){
+for(int j=net->Neus[i]->InNum*0.8;j<net->Neus[i]->InNum;j++){
 (*((*net).Neus[i])).InNeus[j]=(*net).Neus[rand()%(*net).NeuNum];
 }
   heap_free(pre);

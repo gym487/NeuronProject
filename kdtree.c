@@ -206,7 +206,7 @@ return 0;
 }
 void heap_free(struct heap* heap){
 free(heap->hn);
-//free(heap);
+free(heap);
 }
 int heap_remove_max(struct heap* heap){
 int i,c;
@@ -416,7 +416,7 @@ return list;
 static int find_nearest_n(struct kdnode *node, const double *pos, double range, int num, struct heap *heap, int dim)
 {	//TODO: Make a real heap here.List is TOO slow.
       //  if(res_size(heap)<num){
-//printf("size %d",res_size(heap));
+//printf("size %d\n",heap->size);
 	double dist_sq, dx,range_sq;
 	int i, ret, added_res = 0;
 	range_sq=SQ(range);
@@ -439,7 +439,7 @@ static int find_nearest_n(struct kdnode *node, const double *pos, double range, 
 			if(maxelem->dist > dist_sq) {
 				heap_remove_max(heap);
 
-				if(heap_insert(heap, (void*)node, dist_sq) == -1) {
+				if(heap_insert(heap, node, dist_sq) == -1) {
 					return -1;
 				}
 				//added_lists = 1;
@@ -447,7 +447,7 @@ static int find_nearest_n(struct kdnode *node, const double *pos, double range, 
 				range_sq = dist_sq;
 			}
 		} else {
-			if(heap_insert(heap, (void*)node, dist_sq) == -1) {
+			if(heap_insert(heap, node, dist_sq) == -1) {
 				return -1;
 			}
 			added_res = 1;
