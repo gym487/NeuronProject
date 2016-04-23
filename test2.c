@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 
   /* free our tree, results set, and other allocated memory */
   free( data );
-  heap_free( presults );
+ // heap_free( presults );
   kd_free( ptree );
 
   return 0;

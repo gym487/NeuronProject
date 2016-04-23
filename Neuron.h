@@ -18,6 +18,10 @@ struct IzhNeu** Neus;
 unsigned int NeuNum;
 unsigned int NetNum;//
 };
+struct NetU{
+struct Network **NetList;
+int NetNum;
+};
 unsigned long seed=0;
 void SeedInti(){		//Intitial a seed for Rand()
 srand((unsigned)time(NULL));
@@ -207,4 +211,9 @@ StepV((*net).Neus[i]);
 //StepI((*net).Neus[i]);
 
 }
+}
+struct NetU* NetUGen(int num){
+struct NetU* u=malloc(sizeof(struct NetU));
+u->NetList=malloc(sizeof(struct Network*));
+return u;
 }

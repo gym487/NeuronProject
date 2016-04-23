@@ -641,7 +641,7 @@ struct heap *kd_nearest_n(struct kdtree *kd, const double *pos, int num,double r
 {
 	int ret;
 	//struct kdres *rset;
-	struct heap* heap=heap_alloc(10000);
+	struct heap* heap=heap_alloc(1000);//enough.
 	//if(!(rset = malloc(sizeof *rset))) {
 	//	return 0;
 	//}
