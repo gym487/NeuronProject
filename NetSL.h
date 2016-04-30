@@ -68,6 +68,7 @@ close(fp);
 }
 struct NetU* NetULoad(char* a){
 int fp;
+int nnum;
 fpp=malloc(10000000*sizeof(char));
 
 fp=open(a,O_RDWR|O_CREAT,0777);
@@ -89,7 +90,7 @@ for(int j=0;j<netu->NetList[i]->NeuNum;j++){
 netu->NetList[i]->Neus[j]=malloc(sizeof(struct IzhNeu));
 }
 for(int j=0;j<netu->NetList[i]->NeuNum;j++){
-printf("Loading Neu %d \n",j);
+//printf("Loading Neu %d \n",j);
 mrri(fp,&netu->NetList[i]->Neus[j]->InNum,sizeof(netu->NetList[i]->Neus[j]->InNum));
 mrri(fp,&netu->NetList[i]->Neus[j]->a,sizeof(netu->NetList[i]->Neus[j]->a));
 mrri(fp,&netu->NetList[i]->Neus[j]->b,sizeof(netu->NetList[i]->Neus[j]->b));
@@ -101,21 +102,21 @@ mrri(fp,&netu->NetList[i]->Neus[j]->I,sizeof(netu->NetList[i]->Neus[j]->I));
 mrri(fp,&netu->NetList[i]->Neus[j]->x,sizeof(netu->NetList[i]->Neus[j]->x));
 mrri(fp,&netu->NetList[i]->Neus[j]->y,sizeof(netu->NetList[i]->Neus[j]->y));
 mrri(fp,&netu->NetList[i]->Neus[j]->z,sizeof(netu->NetList[i]->Neus[j]->z));
-netu->NetList[i]->Neus[j]->S=malloc(netu->NetList[i]->Neus[j]->InNum*sizeof(void*));
+netu->NetList[i]->Neus[j]->S=malloc(netu->NetList[i]->Neus[j]->InNum*sizeof(float));
 netu->NetList[i]->Neus[j]->InNeus=malloc(netu->NetList[i]->Neus[j]->InNum*sizeof(void*));
-for(int k=0;k<netu->NetList[i]->Neus[j]->InNum;k++){
 
-netu->NetList[i]->Neus[j]->InNeus[k]=malloc(sizeof (void *));
-}
 for(int k=0;k<netu->NetList[i]->Neus[j]->InNum;k++){
-mrri(fp,&netu->NetList[i]->Neus[j]->InNeus[k]->Nnum,sizeof(netu->NetList[i]->Neus[j]->InNeus[k]));
-mrri(fp,&netu->NetList[i]->Neus[j]->S[k],sizeof(netu->NetList[i]->Neus[j]->S[k]));
+mrri(fp,&nnum,sizeof(netu->NetList[i]->Neus[j]->InNeus[k]));
+netu->NetList[i]->Neus[j]->InNeus[k]=netu->NetList[i]->Neus[nnum];
+//printf("%d\n",nnum);
+mrri(fp,&netu->NetList[i]->Neus[j]->S[k],sizeof(float));
 }
 }
 }
-write(fp,fpp,fps);
+
 fps=0;
 free(fpp);
 close(fp);
+return netu;
 }
 
