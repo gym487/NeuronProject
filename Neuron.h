@@ -11,6 +11,7 @@ float x,y,z;
 unsigned int InNum,Nnum;
 char fired;
 struct IzhNeu** InNeus;//In fact it is the list of output-to neurons.
+
 float* S;
 };
 struct Network{
