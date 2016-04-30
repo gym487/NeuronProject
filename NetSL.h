@@ -45,7 +45,7 @@ mwri(fp,&netu->NetList[i]->Neus[j]->x,sizeof(netu->NetList[i]->Neus[j]->x));
 mwri(fp,&netu->NetList[i]->Neus[j]->y,sizeof(netu->NetList[i]->Neus[j]->y));
 mwri(fp,&netu->NetList[i]->Neus[j]->z,sizeof(netu->NetList[i]->Neus[j]->z));
 for(int k=0;k<netu->NetList[i]->Neus[j]->InNum;k++){
-mwri(fp,&netu->NetList[i]->Neus[j]->InNeus[k],sizeof(netu->NetList[i]->Neus[j]->InNeus[k]));
+mwri(fp,&netu->NetList[i]->Neus[j]->InNeus[k]->Nnum,sizeof(netu->NetList[i]->Neus[j]->InNeus[k]));
 }
 }
 }
