@@ -7,58 +7,51 @@
 #include <unistd.h>
 #include <fcntl.h>
 #define sit sizeof(off_t)
-//TODO:Add the function of Saving / Loading network on disk file HERE.
-off_t nuw(struct IzhNeu *nu,off_t a,void *in){
-int i;
-*(int*)(in+a)=nu->InNum;
-for(i=0;i<nu->InNum;i++){
-*(int*)(in+a+(i+1)*sizeof(int))=nu->InNeus[i]->Nnum;
+//TODO:Rewrite ALL.
+void* fpp;
+int fps=0;
+void mwri( int g,void* b,int c){
+if(fps>9000000){
+write(g,fpp,fps);
+fps=0;
 }
-return a+(i+1)*sizeof(int);
+fps+=c;
+memcpy(fpp+fps,b,c);
 }
-off_t ntw(struct Network *nt,off_t a,void *in){
-int i;
-off_t b,c;
-*(int*)(in+a)=nt->NeuNum;
-c=a+sizeof(int);
-b=a+sizeof(int)+sit*nt->NeuNum;
-for(i=0;i<nt->NeuNum;i++){
-*(off_t*)(c+sit*i+in)=b;
-b=nuw(nt->Neus[i],b,in);
-}
-return b;
-}
-
 
 
 void NetUSave(char* a,struct NetU* netu){
 int fp;
+fpp=malloc(10000000*sizeof(char));
+
 fp=open(a,O_RDWR|O_CREAT,0777);
-//long b,c,d,e,f;
-off_t b;
-b=sizeof(int);
+
+mwri(fp,&netu->NetNum,sizeof(netu->NetNum));
+printf("Saving NetU..\n");
 for(int i=0;i<netu->NetNum;i++){
-b+=sizeof(int);
-b+=sit;
+printf("Saving Net %d \n",i);
+mwri(fp,&netu->NetList[i]->NeuNum,sizeof(netu->NetList[i]->NeuNum));
 for(int j=0;j<netu->NetList[i]->NeuNum;j++){
-b+=sizeof(int);
-b+=sit;
-b+=sizeof(int)*netu->NetList[i]->Neus[j]->InNum;
+printf("Saving Neu %d \n",j);
+mwri(fp,&netu->NetList[i]->Neus[j]->InNum,sizeof(netu->NetList[i]->Neus[j]->InNum));
+mwri(fp,&netu->NetList[i]->Neus[j]->a,sizeof(netu->NetList[i]->Neus[j]->a));
+mwri(fp,&netu->NetList[i]->Neus[j]->b,sizeof(netu->NetList[i]->Neus[j]->b));
+mwri(fp,&netu->NetList[i]->Neus[j]->c,sizeof(netu->NetList[i]->Neus[j]->c));
+mwri(fp,&netu->NetList[i]->Neus[j]->d,sizeof(netu->NetList[i]->Neus[j]->d));
+mwri(fp,&netu->NetList[i]->Neus[j]->u,sizeof(netu->NetList[i]->Neus[j]->u));
+mwri(fp,&netu->NetList[i]->Neus[j]->v,sizeof(netu->NetList[i]->Neus[j]->v));
+mwri(fp,&netu->NetList[i]->Neus[j]->I,sizeof(netu->NetList[i]->Neus[j]->I));
+mwri(fp,&netu->NetList[i]->Neus[j]->x,sizeof(netu->NetList[i]->Neus[j]->x));
+mwri(fp,&netu->NetList[i]->Neus[j]->y,sizeof(netu->NetList[i]->Neus[j]->y));
+mwri(fp,&netu->NetList[i]->Neus[j]->z,sizeof(netu->NetList[i]->Neus[j]->z));
+for(int k=0;k<netu->NetList[i]->Neus[j]->InNum;k++){
+mwri(fp,&netu->NetList[i]->Neus[j]->InNeus[k],sizeof(netu->NetList[i]->Neus[j]->InNeus[k]));
 }
 }
-printf("size:%ld\n",b);
-void *memm=malloc(b);
-int k;
-off_t c,d;
-*(int*)(memm)=netu->NetNum;
-c=sizeof(int);
-b=sizeof(int)+sit*netu->NetNum;
-for(int i=0;i<netu->NetNum;i++){
-*(off_t*)(c+sit*i+memm)=d;
-b=ntw(netu->NetList[i],d,memm);
 }
-write(fp,memm,b);
-free(memm);
+write(fp,fpp,fps);
+fps=0;
+free(fpp);
 close(fp);
 }
 struct Network* NetLoad(char* a){
