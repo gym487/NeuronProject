@@ -1,13 +1,11 @@
 #include<stdio.h>
 #define __USE_FILE_OFFSET64
-//#include"Neuron.h"
 #include<sys/io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 #define sit sizeof(off_t)
-//TODO:Rewrite ALL.
 void* fpp;
 int fps=0;
 int fpps=0;
@@ -90,7 +88,6 @@ for(int j=0;j<netu->NetList[i]->NeuNum;j++){
 netu->NetList[i]->Neus[j]=malloc(sizeof(struct IzhNeu));
 }
 for(int j=0;j<netu->NetList[i]->NeuNum;j++){
-//printf("Loading Neu %d \n",j);
 mrri(fp,&netu->NetList[i]->Neus[j]->InNum,sizeof(netu->NetList[i]->Neus[j]->InNum));
 mrri(fp,&netu->NetList[i]->Neus[j]->a,sizeof(netu->NetList[i]->Neus[j]->a));
 mrri(fp,&netu->NetList[i]->Neus[j]->b,sizeof(netu->NetList[i]->Neus[j]->b));
@@ -108,7 +105,6 @@ netu->NetList[i]->Neus[j]->InNeus=malloc(netu->NetList[i]->Neus[j]->InNum*sizeof
 for(int k=0;k<netu->NetList[i]->Neus[j]->InNum;k++){
 mrri(fp,&nnum,sizeof(netu->NetList[i]->Neus[j]->InNeus[k]));
 netu->NetList[i]->Neus[j]->InNeus[k]=netu->NetList[i]->Neus[nnum];
-//printf("%d\n",nnum);
 mrri(fp,&netu->NetList[i]->Neus[j]->S[k],sizeof(float));
 }
 }
